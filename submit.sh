@@ -3,7 +3,7 @@
 ## Nombre del trabajo
 #SBATCH --job-name=TestRLNP
 ## Archivo de salida
-#SBATCH --output=../salida.txt
+#SBATCH --output=../ExpResults/salida.txt
 ## Partición (Cola de trabajo)
 #SBATCH --partition=512x1024
 ## Solicitud de cpus
