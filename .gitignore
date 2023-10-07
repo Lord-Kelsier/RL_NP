@@ -1,5 +1,7 @@
 # IDE
 .idea/
+# vscode
+.vscode/
 
 # mypy
 .mypy_cache/
@@ -23,3 +25,4 @@ src/
 output/
 *.ipynb
 *.out
+LocalEXP/

@@ -103,6 +103,7 @@ def rollout(ac: AbstractActorCritic,
             struc_vis_save: bool = False,
             num_steps: Optional[int] = None,
             num_episodes: Optional[int] = None) -> dict:
+    print("--Rollout starting--")
     assert num_steps or num_episodes # Either num_steps or num_episodes must be specified
     num_steps = num_steps if num_steps is not None else np.inf # If num_steps is not specified it's set to infinity
     num_episodes = num_episodes if num_episodes is not None else np.inf # If num_episodes is not specified it's set to infinty
@@ -117,10 +118,12 @@ def rollout(ac: AbstractActorCritic,
     ep_counter = 0
     step = 0
     start_time = time.time()
-
+    # print("--Action space: [0]", ac.action_space[0], "|[1]", ac.action_space[1])
+    # print("Steps: ")
     while step < num_steps and ep_counter < num_episodes:
+        # print(step, end="-")
         pred = ac.step([obs]) # Make a step according to current observation using the AbstractActorCritic
-
+        # print("pred step", step, ":", pred)
         a = to_numpy(pred['a'][0]) # Get action
         next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))
         # Get next observation, reward and boolean for "done" using action and observation
@@ -158,14 +161,14 @@ def rollout(ac: AbstractActorCritic,
             # use ending .png while testing
             # change to .traj once satisfied with algorithm
             if struc_vis_save == True:
-                write(vis_dir + '/Structure_iter' + str(iteration_ctr) + '.traj',
+                write(vis_dir + '/Structure_iter' + str(iteration_ctr) + '.png',
                       env.current_atoms)
 
                 print('------------------------------------Created trajectory------------------------------------')
 
             obs = env.reset()
             ep_length = 0
-
+    print("--end steps")
     # Compute statistics
     return_mean, return_std = mpi_mean_std(np.asarray(ep_returns), axis=0)
     ep_length_mean, ep_length_std = mpi_mean_std(np.asarray(ep_lengths), axis=0)
@@ -318,6 +321,7 @@ def ppo(
         data = buffer.get()
 
         # Train policy
+        print("--Training policy")
         train_info = train(ac=ac,
                            optimizer=optimizer,
                            data=data,
@@ -338,6 +342,7 @@ def ppo(
         total_num_steps += num_steps_per_iter
 
         # Evaluate policy
+        print("--Evaluating Policy")
         if (iteration % eval_freq == 0) or (iteration == max_num_iterations - 1):
             # Create new buffer every time as it's not filled
             eval_buffer = PPOBuffer(int_act_dim=ac.internal_action_dim, size=eval_buffer_size, gamma=gamma, lam=lam)
@@ -360,5 +365,6 @@ def ppo(
                 rollout_saver.save(eval_buffer, num_steps=total_num_steps, info='eval')
 
         # Save model
+        print("--Saving model")
         if model_handler and ((iteration % save_freq == 0) or (iteration == max_num_iterations - 1)):
             model_handler.save(ac, num_steps=total_num_steps)

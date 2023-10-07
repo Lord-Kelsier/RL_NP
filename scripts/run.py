@@ -166,8 +166,10 @@ def main() -> None:
 
     start_num_steps = 0
     if not config['load_model']:
+        print("Building model")
         model = build_model(config, observation_space=observation_space, action_space=action_space)
     else:
+        print("Loading model")
         model, start_num_steps = model_handler.load()
         model.action_space = action_space
         model.observation_space = observation_space
