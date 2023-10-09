@@ -126,7 +126,7 @@ def build_model(config: dict, observation_space: ObservationSpace, action_space:
             critic_network_width=config['critic_network_width'],
             actor_network_width=config['actor_network_width'],
             actor_depth=config['actor_depth'],
-            device=torch.device('cpu'),
+            device=torch.device('cuda'),
     )
    elif config['model'] == 'equivariant':
         return EQAC(
@@ -137,7 +137,7 @@ def build_model(config: dict, observation_space: ObservationSpace, action_space:
             critic_network_width=config['critic_network_width'],
             num_interactions=config["num_interactions"],
             cutoff=config["cutoff"],
-            device=torch.device('cpu'),
+            device=torch.device('cuda'),
     )
 
 
