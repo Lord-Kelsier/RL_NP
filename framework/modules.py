@@ -2,7 +2,7 @@ import torch
 import torch.distributions
 
 
-def to_one_hot(indices: torch.Tensor, num_classes: int, device=torch.device('cpu')) -> torch.Tensor:
+def to_one_hot(indices: torch.Tensor, num_classes: int, device=torch.device('cuda')) -> torch.Tensor:
     """
     Generates one-hot encoding with <num_classes> classes from <indices>
 
