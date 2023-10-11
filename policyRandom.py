@@ -12,5 +12,4 @@ def randomPolicy(observation):
   dihedral = np.random.uniform(-np.pi, np.pi)
   kappa = np.random.choice([-1, 1])
   out =  np.array([stop, focus, element, distance, angle, dihedral, kappa])
-  print(out)
   return out
