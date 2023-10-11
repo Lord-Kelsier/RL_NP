@@ -125,7 +125,7 @@ def rollout(ac: AbstractActorCritic,
         pred = ac.step([obs]) # Make a step according to current observation using the AbstractActorCritic
         # print("pred step", step, ":", pred)
         a = to_numpy(pred['a'][0]) # Get action
-        a = randomPolicy(observation = obs)
+        # a = randomPolicy(observation = obs)
         next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))
         # Get next observation, reward and boolean for "done" using action and observation
         buffer.store(obs=obs,
