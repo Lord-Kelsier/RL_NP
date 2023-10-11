@@ -8,8 +8,7 @@
 ##SBATCH --partition=512x1024
 ## Solicitud de cpus
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=4G
+#SBATCH --cpus-per-task=4
 #SBATCH --mail-user=econtreraslazcano@uc.cl
 #SBATCH --mail-type=ALL
 
