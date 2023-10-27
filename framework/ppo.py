@@ -16,6 +16,7 @@ from framework.environment import AbstractMolecularEnvironment
 from framework.tools.mpi import mpi_avg, mpi_avg_grads, get_num_procs, mpi_sum, mpi_mean_std
 from framework.tools.util import RolloutSaver, to_numpy, ModelIO, InfoSaver
 from policyRandom import randomPolicy
+from greedyPolicy import greedyPolicy, udpateGreedyPolicy
 
 def compute_loss(ac: AbstractActorCritic, data: dict, clip_ratio: float, vf_coef: float,
                  entropy_coef: float) -> Tuple[torch.Tensor, dict]:
@@ -125,8 +126,12 @@ def rollout(ac: AbstractActorCritic,
         pred = ac.step([obs]) # Make a step according to current observation using the AbstractActorCritic
         # print("pred step", step, ":", pred)
         a = to_numpy(pred['a'][0]) # Get action
+
         # next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs))
-        next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))
+        action, length = greedyPolicy(obs)
+        next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs))
+        udpateGreedyPolicy(reward, action, length)
+        # next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))
         # Get next observation, reward and boolean for "done" using action and observation
         buffer.store(obs=obs,
                      act=a,
