@@ -127,11 +127,11 @@ def rollout(ac: AbstractActorCritic,
         # print("pred step", step, ":", pred)
         a = to_numpy(pred['a'][0]) # Get action
 
-        # next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs)) # RANDOM
+        next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs)) # RANDOM
         # action, length = greedyPolicy(obs)# GREEDY 
         # next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs))# GREEDY 
         # udpateGreedyPolicy(reward, action, length)# GREEDY 
-        next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))# Original
+        # next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))# Original
         # Get next observation, reward and boolean for "done" using action and observation
         buffer.store(obs=obs,
                      act=a,
