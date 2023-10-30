@@ -127,11 +127,11 @@ def rollout(ac: AbstractActorCritic,
         # print("pred step", step, ":", pred)
         a = to_numpy(pred['a'][0]) # Get action
 
-        # next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs))
-        action, length = greedyPolicy(obs)
-        next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs))
-        udpateGreedyPolicy(reward, action, length)
-        # next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))
+        # next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs)) # RANDOM
+        # action, length = greedyPolicy(obs)# GREEDY 
+        # next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs))# GREEDY 
+        # udpateGreedyPolicy(reward, action, length)# GREEDY 
+        next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))# Original
         # Get next observation, reward and boolean for "done" using action and observation
         buffer.store(obs=obs,
                      act=a,
@@ -167,7 +167,7 @@ def rollout(ac: AbstractActorCritic,
             # use ending .png while testing
             # change to .traj once satisfied with algorithm
             if struc_vis_save == True:
-                write(vis_dir + '/Structure_iter' + str(iteration_ctr) + '.png',
+                write(vis_dir + '/Structure_iter' + str(iteration_ctr) + '.traj',
                       env.current_atoms)
 
                 print('------------------------------------Created trajectory------------------------------------')
