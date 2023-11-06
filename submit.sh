@@ -10,7 +10,6 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 ## Solicitud de memoria RAM en GB
-#SBATCH --mem=32
 #SBATCH --mail-user=econtreraslazcano@uc.cl
 #SBATCH --mail-type=ALL
 
