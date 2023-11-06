@@ -23,6 +23,7 @@ def checkFiles():
       MaxReward = {
         "reward": None,
         "positions": None,
+        "olderCandidates": []
       }
       json.dump(MaxReward, f)
   if FOLDER not in os.listdir():
@@ -42,6 +43,10 @@ def saveMaxReward(reward, observation):
   elif reward > MaxReward["reward"]:
     isUpdating = True
   if isUpdating:
+    MaxReward["olderCandidates"].append({
+      "positions": MaxReward["positions"],
+      "reward": MaxReward["reward"]
+      })
     MaxReward["reward"] = reward
     MaxReward["positions"] = observation[0]
   with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "w") as f:
