@@ -31,6 +31,7 @@ def checkFiles():
     createFile()
   
 def saveMaxReward(reward, observation):
+  checkFiles()
   if observation[0][-1][0] == 0:
     return
   with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "r") as f:
