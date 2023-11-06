@@ -2,9 +2,7 @@ import numpy as np
 from policyRandom import randomPolicy
 import os
 import json
-FOLDER = "GreedySave"
-AuAtoms = 13
-EPSILON = 0.6
+from Params import FOLDERGREEDY as FOLDER, AuAtoms, EPSILON
 
 def checkFiles():
   def createFile():

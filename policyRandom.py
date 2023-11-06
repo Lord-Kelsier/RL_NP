@@ -1,4 +1,7 @@
 import numpy as np
+import json
+import os
+from Params import FOLDERRANDOM as FOLDER, AuAtoms, EPSILON
 def randomPolicy(observation):
   for i, obs in enumerate(observation[0]):
     if i == 0: continue
@@ -13,3 +16,32 @@ def randomPolicy(observation):
   kappa = np.random.choice([-1, 1])
   out =  np.array([stop, focus, element, distance, angle, dihedral, kappa])
   return out
+
+def checkFiles():
+  def createFile():
+    with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "w") as f:
+      MaxReward = {
+        "reward": None,
+        "positions": None,
+      }
+      json.dump(MaxReward, f)
+  if FOLDER not in os.listdir():
+    os.mkdir(FOLDER)
+  if f"Au{AuAtoms}-epsilon={EPSILON}.json" not in os.listdir(FOLDER):
+    createFile()
+  
+def saveMaxReward(reward, observation):
+  if observation[0][-1][0] == 0:
+    return
+  with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "r") as f:
+    MaxReward = json.load(f)
+  isUpdating = False
+  if MaxReward["reward"] == None: 
+    isUpdating = True
+  elif reward > MaxReward["reward"]:
+    isUpdating = True
+  if isUpdating:
+    MaxReward["reward"] = reward
+    MaxReward["positions"] = observation[0]
+  with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "w") as f:
+    json.dump(MaxReward, f)
