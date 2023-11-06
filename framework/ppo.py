@@ -120,12 +120,12 @@ def rollout(ac: AbstractActorCritic,
     step = 0
     start_time = time.time()
     # print("--Action space: [0]", ac.action_space[0], "|[1]", ac.action_space[1])
-    # print("Steps: ")
+    print("Steps: ")
     while step < num_steps and ep_counter < num_episodes:
-        # print(step, end="-")
-        pred = ac.step([obs]) # Make a step according to current observation using the AbstractActorCritic
+        print(step, end="-")
+        # pred = ac.step([obs]) # Make a step according to current observation using the AbstractActorCritic
         # print("pred step", step, ":", pred)
-        a = to_numpy(pred['a'][0]) # Get action
+        # a = to_numpy(pred['a'][0]) # Get action
 
         next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs)) # RANDOM
         # action, length = greedyPolicy(obs)# GREEDY 
@@ -133,13 +133,13 @@ def rollout(ac: AbstractActorCritic,
         # udpateGreedyPolicy(reward, action, length)# GREEDY 
         # next_obs, reward, done, _ = env.step(ac.to_action_space(action=a, observation=obs))# Original
         # Get next observation, reward and boolean for "done" using action and observation
-        buffer.store(obs=obs,
-                     act=a,
-                     reward=reward,
-                     next_obs=next_obs,
-                     terminal=done,
-                     value=pred['v'].item(),
-                     logp=pred['logp'].item())
+        # buffer.store(obs=obs,
+        #              act=a,
+        #              reward=reward,
+        #              next_obs=next_obs,
+        #              terminal=done,
+        #              value=pred['v'].item(),
+        #              logp=pred['logp'].item())
         # Store information in buffer
 
         obs = next_obs # step to next observation
@@ -150,50 +150,51 @@ def rollout(ac: AbstractActorCritic,
         last_step = step == num_steps - 1
         if done or last_step:
             # if trajectory didn't reach terminal state, bootstrap value target of next observation
-            if not done:
-                pred = ac.step([obs])
-                value = float(pred['v'])
-            else:
-                value = 0
+            # if not done:
+            #     pred = ac.step([obs])
+            #     value = float(pred['v'])
+            # else:
+            #     value = 0
 
-            ep_return = buffer.finish_path(value)
+            # ep_return = buffer.finish_path(value)
 
             if done:
-                ep_returns.append(ep_return)
+                # ep_returns.append(ep_return)
                 ep_lengths.append(ep_length)
                 ep_counter += 1
 
             ## CREATE STRUCTURE VISUALIZATION
             # use ending .png while testing
             # change to .traj once satisfied with algorithm
-            if struc_vis_save == True:
-                write(vis_dir + '/Structure_iter' + str(iteration_ctr) + '.traj',
-                      env.current_atoms)
+            # if struc_vis_save == True:
+            #     write(vis_dir + '/Structure_iter' + str(iteration_ctr) + '.traj',
+            #           env.current_atoms)
 
-                print('------------------------------------Created trajectory------------------------------------')
+            #     print('------------------------------------Created trajectory------------------------------------')
 
             obs = env.reset()
             ep_length = 0
     print("--end steps")
+    return
     # Compute statistics
-    return_mean, return_std = mpi_mean_std(np.asarray(ep_returns), axis=0)
-    ep_length_mean, ep_length_std = mpi_mean_std(np.asarray(ep_lengths), axis=0)
+    # return_mean, return_std = mpi_mean_std(np.asarray(ep_returns), axis=0)
+    # ep_length_mean, ep_length_std = mpi_mean_std(np.asarray(ep_lengths), axis=0)
 
-    value_mean, value_std = mpi_mean_std(buffer.val_buf[:buffer.ptr], axis=0)
-    logp_mean, logp_std = mpi_mean_std(buffer.logp_buf[:buffer.ptr], axis=0)
+    # value_mean, value_std = mpi_mean_std(buffer.val_buf[:buffer.ptr], axis=0)
+    # logp_mean, logp_std = mpi_mean_std(buffer.logp_buf[:buffer.ptr], axis=0)
 
-    return {
-        'time': time.time() - start_time,
-        'num_steps': mpi_sum(np.asarray(step)).item(),
-        'return_mean': return_mean.item(),
-        'return_std': return_std.item(),
-        'value_mean': value_mean.item(),
-        'value_std': value_std.item(),
-        'logp_mean': logp_mean.item(),
-        'logp_std': logp_std.item(),
-        'episode_length_mean': ep_length_mean.item(),
-        'episode_length_std': ep_length_std.item(),
-    }
+    # return {
+    #     'time': time.time() - start_time,
+    #     'num_steps': mpi_sum(np.asarray(step)).item(),
+    #     'return_mean': return_mean.item(),
+    #     'return_std': return_std.item(),
+    #     'value_mean': value_mean.item(),
+    #     'value_std': value_std.item(),
+    #     'logp_mean': logp_mean.item(),
+    #     'logp_std': logp_std.item(),
+    #     'episode_length_mean': ep_length_mean.item(),
+    #     'episode_length_std': ep_length_std.item(),
+    # }
 
 
 def ppo(
@@ -313,64 +314,64 @@ def ppo(
         # Training rollout
         rollout_info = rollout(ac=ac, env=env, buffer=buffer, vis_dir = vis_dir, struc_vis_save =  False, num_steps=local_steps_per_iter)
 
-        rollout_info['iteration'] = iteration
-        rollout_info['total_num_steps'] = total_num_steps
-        logging.info('Training rollout: ' + str(rollout_info))
-        if info_saver:
-            info_saver.save(rollout_info, name='train')
+        # rollout_info['iteration'] = iteration
+        # rollout_info['total_num_steps'] = total_num_steps
+        # logging.info('Training rollout: ' + str(rollout_info))
+        # if info_saver:
+        #     info_saver.save(rollout_info, name='train')
 
-        # Safe training buffer
-        if rollout_saver and save_train_rollout:
-            rollout_saver.save(buffer, num_steps=total_num_steps, info='train')
+        # # Safe training buffer
+        # if rollout_saver and save_train_rollout:
+        #     rollout_saver.save(buffer, num_steps=total_num_steps, info='train')
 
-        # Obtain (standardized) data for training
-        data = buffer.get()
+        # # Obtain (standardized) data for training
+        # data = buffer.get()
 
-        # Train policy
-        print("--Training policy")
-        train_info = train(ac=ac,
-                           optimizer=optimizer,
-                           data=data,
-                           clip_ratio=clip_ratio,
-                           vf_coef=vf_coef,
-                           entropy_coef=entropy_coef,
-                           target_kl=target_kl,
-                           gradient_clip=gradient_clip,
-                           max_num_steps=max_num_train_iters)
+        # # Train policy
+        # print("--Training policy")
+        # train_info = train(ac=ac,
+        #                    optimizer=optimizer,
+        #                    data=data,
+        #                    clip_ratio=clip_ratio,
+        #                    vf_coef=vf_coef,
+        #                    entropy_coef=entropy_coef,
+        #                    target_kl=target_kl,
+        #                    gradient_clip=gradient_clip,
+        #                    max_num_steps=max_num_train_iters)
 
-        train_info['iteration'] = iteration
-        train_info['total_num_steps'] = total_num_steps
-        logging.info('Optimization: ' + str(train_info))
-        if info_saver:
-            info_saver.save(train_info, name='opt')
+        # train_info['iteration'] = iteration
+        # train_info['total_num_steps'] = total_num_steps
+        # logging.info('Optimization: ' + str(train_info))
+        # if info_saver:
+        #     info_saver.save(train_info, name='opt')
 
-        # Update number of steps taken / trained
-        total_num_steps += num_steps_per_iter
+        # # Update number of steps taken / trained
+        # total_num_steps += num_steps_per_iter
 
-        # Evaluate policy
-        print("--Evaluating Policy")
-        if (iteration % eval_freq == 0) or (iteration == max_num_iterations - 1):
-            # Create new buffer every time as it's not filled
-            eval_buffer = PPOBuffer(int_act_dim=ac.internal_action_dim, size=eval_buffer_size, gamma=gamma, lam=lam)
+        # # Evaluate policy
+        # print("--Evaluating Policy")
+        # if (iteration % eval_freq == 0) or (iteration == max_num_iterations - 1):
+        #     # Create new buffer every time as it's not filled
+        #     eval_buffer = PPOBuffer(int_act_dim=ac.internal_action_dim, size=eval_buffer_size, gamma=gamma, lam=lam)
 
-            with torch.no_grad():
-                ac.training = False
-                rollout_info = rollout(ac, eval_env, eval_buffer, vis_dir = vis_dir, struc_vis_save =  True,
-                                       iteration_ctr = iteration, num_episodes=num_eval_episodes)
-                ac.training = True
+        #     with torch.no_grad():
+        #         ac.training = False
+        #         rollout_info = rollout(ac, eval_env, eval_buffer, vis_dir = vis_dir, struc_vis_save =  True,
+        #                                iteration_ctr = iteration, num_episodes=num_eval_episodes)
+        #         ac.training = True
 
-            # Log information
-            rollout_info['iteration'] = iteration
-            rollout_info['total_num_steps'] = total_num_steps
-            logging.info('Evaluation rollout: ' + str(rollout_info))
-            if info_saver:
-                info_saver.save(rollout_info, name='eval')
+        #     # Log information
+        #     rollout_info['iteration'] = iteration
+        #     rollout_info['total_num_steps'] = total_num_steps
+        #     logging.info('Evaluation rollout: ' + str(rollout_info))
+        #     if info_saver:
+        #         info_saver.save(rollout_info, name='eval')
 
-            # Safe evaluation buffer
-            if rollout_saver and save_eval_rollout:
-                rollout_saver.save(eval_buffer, num_steps=total_num_steps, info='eval')
+        #     # Safe evaluation buffer
+        #     if rollout_saver and save_eval_rollout:
+        #         rollout_saver.save(eval_buffer, num_steps=total_num_steps, info='eval')
 
-        # Save model
-        print("--Saving model")
-        if model_handler and ((iteration % save_freq == 0) or (iteration == max_num_iterations - 1)):
-            model_handler.save(ac, num_steps=total_num_steps)
+        # # Save model
+        # print("--Saving model")
+        # if model_handler and ((iteration % save_freq == 0) or (iteration == max_num_iterations - 1)):
+        #     model_handler.save(ac, num_steps=total_num_steps)
