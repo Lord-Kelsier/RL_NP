@@ -132,7 +132,9 @@ def rollout(ac: AbstractActorCritic,
         # # print("pred step", step, ":", pred)
         # a = to_numpy(pred['a'][0]) # Get action
         if step % 13 == 0:
+            print("Choosing action")
             TakeGreedy = np.random.choice([True, False], p=[epsilonGreedy, 1-epsilonGreedy])
+            print("TakeGreedy:", TakeGreedy)
         if TakeGreedy:
             action = randomPolicy(observation = obs, randomParams = randomParams)
         else:
@@ -143,6 +145,7 @@ def rollout(ac: AbstractActorCritic,
         next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs)) # RANDOM
         newRandomParams = saveMaxReward(reward, next_obs, actionSaver)
         if newRandomParams != None:
+            print("saved new random params")
             randomParams = newRandomParams
         # action, length = greedyPolicy(obs)# GREEDY 
         # next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs))# GREEDY 
