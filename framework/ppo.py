@@ -16,6 +16,7 @@ from framework.environment import AbstractMolecularEnvironment
 from framework.tools.mpi import mpi_avg, mpi_avg_grads, get_num_procs, mpi_sum, mpi_mean_std
 from framework.tools.util import RolloutSaver, to_numpy, ModelIO, InfoSaver
 from policyRandom import randomPolicy, saveMaxReward
+import Params
 # from greedyPolicy import greedyPolicy, udpateGreedyPolicy
 
 def compute_loss(ac: AbstractActorCritic, data: dict, clip_ratio: float, vf_coef: float,
@@ -121,14 +122,28 @@ def rollout(ac: AbstractActorCritic,
     # start_time = time.time()
     # print("--Action space: [0]", ac.action_space[0], "|[1]", ac.action_space[1])
     # print("Steps: ")
+    actionSaver = []
+    randomParams = None
+    epsilonGreedy = Params.EPSILON
+    TakeGreedy = False
     while step < num_steps and ep_counter < num_episodes:
         # print(step, end="-")
         # pred = ac.step([obs]) # Make a step according to current observation using the AbstractActorCritic
         # # print("pred step", step, ":", pred)
         # a = to_numpy(pred['a'][0]) # Get action
-
-        next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs)) # RANDOM
-        saveMaxReward(reward, next_obs)
+        if step % 13 == 0:
+            TakeGreedy = np.random.choice([True, False], p=[epsilonGreedy, 1-epsilonGreedy])
+        if TakeGreedy:
+            action = randomPolicy(observation = obs, randomParams = randomParams)
+        else:
+            action = randomPolicy(observation = obs, randomParams =  None)
+        actionSaver.append(action)
+        if len(actionSaver) > 13: 
+            actionSaver.pop(0)
+        next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs)) # RANDOM
+        newRandomParams = saveMaxReward(reward, next_obs, actionSaver)
+        if newRandomParams != None:
+            randomParams = newRandomParams
         # action, length = greedyPolicy(obs)# GREEDY 
         # next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs))# GREEDY 
         # udpateGreedyPolicy(reward, action, length)# GREEDY 

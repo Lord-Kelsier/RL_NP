@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## Nombre del trabajo
-#SBATCH --job-name=RLNPRandom
+#SBATCH --job-name=RandomGreedy
 ## Archivo de salida
 #SBATCH --output=../ExpResults/random.txt
 ### Partición (Cola de trabajo)
