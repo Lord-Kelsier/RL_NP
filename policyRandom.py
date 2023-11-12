@@ -46,6 +46,7 @@ def saveMaxReward(reward, observation, actionsDone):
   with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}-GreedyRandom.json", "r") as f:
     MaxReward = json.load(f)
   isUpdating = False
+  newParams = None
   if MaxReward["reward"] == None: 
     isUpdating = True
   elif reward > MaxReward["reward"]:
@@ -65,7 +66,6 @@ def saveMaxReward(reward, observation, actionsDone):
       "dihedralMean": dihedrals
     }
     MaxReward["params"] = newParams
-    with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}-GreedyRandom.json", "w") as f:
-      json.dump(MaxReward, f)
-    return newParams
-  return None
+  with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}-GreedyRandom.json", "w") as f:
+    json.dump(MaxReward, f)
+  return newParams
