@@ -36,7 +36,7 @@ def checkFiles():
       json.dump(MaxReward, f)
   if FOLDER not in os.listdir():
     os.mkdir(FOLDER)
-  if f"Au{AuAtoms}-epsilon={EPSILON}.json" not in os.listdir(FOLDER):
+  if f"Au{AuAtoms}-epsilon={EPSILON}-GreedyRandom.json" not in os.listdir(FOLDER):
     createFile()
   
 def saveMaxReward(reward, observation, actionsDone):
