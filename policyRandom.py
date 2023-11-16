@@ -1,6 +1,7 @@
 import numpy as np
 import json
 import os
+import time
 from Params import FOLDERRANDOM as FOLDER, AuAtoms, EPSILON
 def randomPolicy(observation, randomParams):
   for i, obs in enumerate(observation[0]):
@@ -32,6 +33,12 @@ def checkFiles():
         "reward": None,
         "positions": None,
         "params": None,
+        "time": time.time(),
+        "oldersCandidates": {
+          "reward": [],
+          "positions": [],
+          "time": []
+        },
       }
       json.dump(MaxReward, f)
   if FOLDER not in os.listdir():
@@ -56,8 +63,12 @@ def saveMaxReward(reward, observation, actionsDone):
     #   "positions": MaxReward["positions"],
     #   "reward": MaxReward["reward"]
     #   })
+    MaxReward["oldersCandidates"]["positions"].append(MaxReward["positions"])
+    MaxReward["oldersCandidates"]["reward"].append(MaxReward["reward"])
+    MaxReward["oldersCandidates"]["time"].append(MaxReward["time"])
     MaxReward["reward"] = reward
     MaxReward["positions"] = observation[0]
+    MaxReward["time"] = time.time()
     stops, focuses, elements, distances, angles, dihedrals, kappas = zip(*actionsDone)
     newParams = {
       "focus": focuses,
@@ -66,6 +77,7 @@ def saveMaxReward(reward, observation, actionsDone):
       "dihedralMean": dihedrals
     }
     MaxReward["params"] = newParams
+
   with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}-GreedyRandom.json", "w") as f:
     json.dump(MaxReward, f)
   return newParams
