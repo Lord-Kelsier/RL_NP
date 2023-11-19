@@ -37,7 +37,7 @@ def parse_args() -> argparse.Namespace:
                         help='symbols representing elements in bag (comma separated)',
                         type=str,
                         #default='H,He,Li,Be,B,C,N,O,F,Au,Ag,Cu,Al') #- Change according to what you want to build
-                        default='Au,Ag,C,H,O,Al')
+                        default='Au,Ag,C,H,O,Al,Cu')
 
     # Environment
     parser.add_argument('--formulas',
