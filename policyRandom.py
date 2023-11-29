@@ -25,6 +25,7 @@ def checkFiles():
         "reward": None,
         "positions": None,
         "time": time.time(),
+        "step": None,
         "olderCandidates": []
       }
       json.dump(MaxReward, f)
