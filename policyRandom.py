@@ -2,6 +2,7 @@ import numpy as np
 import json
 import os
 from Params import FOLDERRANDOM as FOLDER, AuAtoms, EPSILON
+import time
 def randomPolicy(observation):
   for i, obs in enumerate(observation[0]):
     if i == 0: continue
@@ -12,7 +13,7 @@ def randomPolicy(observation):
   element = 1.0
   distance = np.random.normal(2.75, 0.8)
   angle = np.random.uniform(0.0, np.pi)
-  dihedral = np.random.uniform(-np.pi, np.pi)
+  dihedral = np.random.uniform(0, np.pi)
   kappa = np.random.choice([-1, 1])
   out =  np.array([stop, focus, element, distance, angle, dihedral, kappa])
   return out
@@ -23,6 +24,7 @@ def checkFiles():
       MaxReward = {
         "reward": None,
         "positions": None,
+        "time": time.time(),
         "olderCandidates": []
       }
       json.dump(MaxReward, f)
@@ -31,7 +33,7 @@ def checkFiles():
   if f"Au{AuAtoms}-epsilon={EPSILON}.json" not in os.listdir(FOLDER):
     createFile()
   
-def saveMaxReward(reward, observation):
+def saveMaxReward(reward, observation, step):
   checkFiles()
   if observation[0][-1][0] == 0:
     return
@@ -45,9 +47,13 @@ def saveMaxReward(reward, observation):
   if isUpdating:
     MaxReward["olderCandidates"].append({
       "positions": MaxReward["positions"],
-      "reward": MaxReward["reward"]
+      "reward": MaxReward["reward"],
+      "time": MaxReward["time"],
+      "step": MaxReward["step"]
       })
     MaxReward["reward"] = reward
     MaxReward["positions"] = observation[0]
+    MaxReward["time"] = time.time()
+    MaxReward["step"] = step
   with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "w") as f:
     json.dump(MaxReward, f)

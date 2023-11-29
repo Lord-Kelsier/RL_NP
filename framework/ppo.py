@@ -128,7 +128,7 @@ def rollout(ac: AbstractActorCritic,
         # a = to_numpy(pred['a'][0]) # Get action
 
         next_obs, reward, done, _ = env.step(ac.to_action_space(action=randomPolicy(observation = obs), observation=obs)) # RANDOM
-        saveMaxReward(reward, next_obs)
+        saveMaxReward(reward, next_obs, step)
         # action, length = greedyPolicy(obs)# GREEDY 
         # next_obs, reward, done, _ = env.step(ac.to_action_space(action=action, observation=obs))# GREEDY 
         # udpateGreedyPolicy(reward, action, length)# GREEDY 
