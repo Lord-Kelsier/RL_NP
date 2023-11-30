@@ -2,13 +2,24 @@ import numpy as np
 import json
 import os
 import time
-from Params import FOLDERRANDOM as FOLDER, AuAtoms, EPSILON
+from Params import FOLDERRANDOM as FOLDER, EPSILON
+import ase
+
+Molecule = 'Au7Ag6'
 def randomPolicy(observation, randomParams):
+  AuAtoms = 7
+  AgAtoms = 6
+  AuPos = 1
+  AgPos = 2
   for i, obs in enumerate(observation[0]):
-    if obs[0] == 0: break
-  
+    if obs[0] == ase.data.atomic_numbers['Au']:
+      AuAtoms -= 1
+    elif obs[0] == ase.data.atomic_numbers['Ag']:
+      AgAtoms -= 1
+    elif obs[0] == 0: break
+  totalAtoms = AuAtoms + AgAtoms
   stop = 0.0
-  element = 1.0
+  element = np.random.choice([AuPos, AgPos], 1, [AuAtoms/totalAtoms, AgAtoms/totalAtoms])[0] # position in [Au,Ag,C,H,O,Al,Cu] + 1
   if randomParams == None:
     if i == 0: 
       focus = 0
@@ -28,7 +39,7 @@ def randomPolicy(observation, randomParams):
 
 def checkFiles():
   def createFile():
-    with open(f"{FOLDER}/Au7Ag6-epsilon={EPSILON}-GreedyRandom.json", "w") as f:
+    with open(f"{FOLDER}/{Molecule}-epsilon={EPSILON}-GreedyRandom.json", "w") as f:
       MaxReward = {
         "reward": None,
         "positions": None,
@@ -43,14 +54,14 @@ def checkFiles():
       json.dump(MaxReward, f)
   if FOLDER not in os.listdir():
     os.mkdir(FOLDER)
-  if f"Au7Ag6-epsilon={EPSILON}-GreedyRandom.json" not in os.listdir(FOLDER):
+  if f"{Molecule}-epsilon={EPSILON}-GreedyRandom.json" not in os.listdir(FOLDER):
     createFile()
   
 def saveMaxReward(reward, observation, actionsDone):
   checkFiles()
   if observation[0][-1][0] == 0:
     return
-  with open(f"{FOLDER}/Au7Ag6-epsilon={EPSILON}-GreedyRandom.json", "r") as f:
+  with open(f"{FOLDER}/{Molecule}-epsilon={EPSILON}-GreedyRandom.json", "r") as f:
     MaxReward = json.load(f)
   isUpdating = False
   newParams = None
@@ -78,6 +89,6 @@ def saveMaxReward(reward, observation, actionsDone):
     }
     MaxReward["params"] = newParams
 
-  with open(f"{FOLDER}/Au7Ag6-epsilon={EPSILON}-GreedyRandom.json", "w") as f:
+  with open(f"{FOLDER}/{Molecule}-epsilon={EPSILON}-GreedyRandom.json", "w") as f:
     json.dump(MaxReward, f)
   return newParams
