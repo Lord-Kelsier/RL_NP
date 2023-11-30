@@ -20,7 +20,7 @@ def randomPolicy(observation):
 
 def checkFiles():
   def createFile():
-    with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "w") as f:
+    with open(f"{FOLDER}/Au7Ag6-epsilon={EPSILON}.json", "w") as f:
       MaxReward = {
         "reward": None,
         "positions": None,
@@ -31,14 +31,14 @@ def checkFiles():
       json.dump(MaxReward, f)
   if FOLDER not in os.listdir():
     os.mkdir(FOLDER)
-  if f"Au{AuAtoms}-epsilon={EPSILON}.json" not in os.listdir(FOLDER):
+  if f"Au7Ag6-epsilon={EPSILON}.json" not in os.listdir(FOLDER):
     createFile()
   
 def saveMaxReward(reward, observation, step):
   checkFiles()
   if observation[0][-1][0] == 0:
     return
-  with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "r") as f:
+  with open(f"{FOLDER}/Au7Ag6-epsilon={EPSILON}.json", "r") as f:
     MaxReward = json.load(f)
   isUpdating = False
   if MaxReward["reward"] == None: 
@@ -56,5 +56,5 @@ def saveMaxReward(reward, observation, step):
     MaxReward["positions"] = observation[0]
     MaxReward["time"] = time.time()
     MaxReward["step"] = step
-  with open(f"{FOLDER}/Au{AuAtoms}-epsilon={EPSILON}.json", "w") as f:
+  with open(f"{FOLDER}/Au7Ag6-epsilon={EPSILON}.json", "w") as f:
     json.dump(MaxReward, f)
